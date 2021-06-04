@@ -13,9 +13,9 @@ def main():
 
     w = QTabWidget()
     w.resize(800, 500)
-    w.setWindowTitle('COBOT V. 0.0')
+    w.setWindowTitle('v0.0.1')
 
-    w.addTab(ProfilesTab(), 'Profiles')
+    #w.addTab(ProfilesTab(), 'Profiles')
     w.addTab(AccountsTab(), 'Accounts')
 
 
@@ -45,7 +45,7 @@ class AccountsTab(QWidget):
         hbox = QHBoxLayout()
 
         acounts_gbox = AccountBox("Accounts")
-        account_display = AccountsDisplayBox("Accounts")
+        account_display = AccountsDisplayBox("Accounts", '')
         hbox.addWidget(acounts_gbox)
         hbox.addWidget(account_display)
 
@@ -55,9 +55,6 @@ class AccountsTab(QWidget):
 #     def __init__(self):
 #         super(QWidget, self).__init__()
       
-
-
-
 
 # class SettingsTab(QWidget):
 #     def __init__(self):

@@ -6,6 +6,7 @@ from datetime import datetime
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 
+from src.script import *
 
 con = sqlite3.connect('store.db')
 cur = con.cursor()
@@ -57,23 +58,63 @@ class AccountBox(QGroupBox):
         with con:
             cur.execute('INSERT INTO accounts (account, password) values (?, ?)', (username, password))
         
-        #just for testing 
-        QMessageBox.question(self, 'Account JSON', json_data, QMessageBox.Yes| QMessageBox.No, QMessageBox.No)
 
 class AccountsDisplayBox(QGroupBox):
-    def __init__(self, Title):
+    def __init__(self, Title, displaybox):
         super(QGroupBox, self).__init__()
         self.setTitle('Accounts Added')
-
-        self.button = QPushButton('Refresh', self)
-
+        
         listdisplay = QListWidget()
+        self.displaybox = listdisplay
+        
+        with con: 
+            cur.execute('SELECT account FROM accounts;')
+            accounts = cur.fetchall()
+
+
+        for account in accounts:
+            item = QListWidgetItem(account[0])
+            listdisplay.addItem(item)
 
         layout = QFormLayout()
         layout.addRow(listdisplay)
-        layout.addRow(self.button)
+
+        self.startButton = QPushButton('Start', self)
+        self.rbutton = QPushButton('Refresh', self)
+        self.dbutton = QPushButton('Delete', self)
+        self.rbutton.setToolTip('Refresh Accounts')
+        self.dbutton.setToolTip('Delete Account')
+        self.rbutton.clicked.connect(self.on_refresh_click)
+        self.dbutton.clicked.connect(self.on_delete_click)
+        self.startButton.clicked.connect(self.on_start_click)
+        layout.addRow(self.rbutton)
+        layout.addRow(self.dbutton)
+        layout.addRow(self.startButton)
         
         self.setLayout(layout)
 
-
+    def on_refresh_click(self):
         
+        accounts = []
+        listdisplay = self.displaybox
+
+        listdisplay.clear()
+
+        with con: 
+            cur.execute('SELECT account FROM accounts;')
+            accounts = cur.fetchall()
+
+        for account in accounts:
+            item = QListWidgetItem(account[0])
+            listdisplay.addItem(item)
+
+    def on_delete_click(self):
+        items = self.displaybox.selectedItems()
+        for item in items:
+            self.displaybox.takeItem(self.displaybox.row(item))
+            with con:
+                cur.execute("DELETE FROM accounts where account = ?", (item.text(),))
+
+    def on_start_click(self):
+        run_checkout()
+
